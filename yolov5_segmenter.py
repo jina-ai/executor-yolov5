@@ -31,7 +31,7 @@ class YoloV5Segmenter(Executor):
                  device: str = 'cpu',
                  size: int = 640,
                  augment: bool = False,
-                 default_confidence_threshold: float = 0.25,
+                 default_confidence_threshold: float = 0.3,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model_name_or_path = model_name_or_path
