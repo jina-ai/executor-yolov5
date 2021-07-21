@@ -130,5 +130,5 @@ print(f'{resp}')
 
 
 ## 🔍️ Reference
-- [YoloV5 paper](https://arxiv.org/abs/1506.02640v5)
+- [Yolo paper](https://arxiv.org/abs/1506.02640v5)
 - [YoloV5 code](https://github.com/ultralytics/yolov5)
