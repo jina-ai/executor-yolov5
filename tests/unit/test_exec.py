@@ -32,8 +32,8 @@ def test_model_name_or_path(build_da, model_path):
         assert len(doc.chunks) > 0
         for chunk in doc.chunks:
             assert chunk.blob.ndim == 3
-            assert chunk.tags.get("label")
-            assert chunk.tags.get("conf")
+            assert chunk.tags.get('label')
+            assert chunk.tags.get('conf')
 
 
 @pytest.mark.parametrize(
@@ -47,7 +47,7 @@ def test_n_detections(build_da, model_path, expected_detections):
     segmenter = YoloV5Segmenter(model_name_or_path=model_path)
     segmenter.segment(da, parameters={})
     for doc in da:
-        assert len(doc.chunks) == expected_detections[doc.tags["filename"]]
+        assert len(doc.chunks) == expected_detections[doc.tags['filename']]
 
 
 @pytest.mark.parametrize(
@@ -63,8 +63,8 @@ def test_confidence_threshold(build_da, confidence_threshold, expected_detection
                                 default_confidence_threshold=confidence_threshold)
     segmenter.segment(da, parameters={})
     for doc in da:
-        assert len(doc.chunks) == expected_detections[doc.tags["filename"]]
-        assert all(chunk.tags["conf"] >= confidence_threshold for chunk in doc.chunks)
+        assert len(doc.chunks) == expected_detections[doc.tags['filename']]
+        assert all(chunk.tags['conf'] >= confidence_threshold for chunk in doc.chunks)
 
 
 def test_traversal_paths():

@@ -1,5 +1,5 @@
 
-# ✨ AudioCLIPEncoder
+# ✨ YoloV5Segmenter
 
 **YoloV5Segmenter** is a class that wraps the [YoloV5](https://github.com/ultralytics/yolov5) model for generating bounding boxes from images and creating chunks. 
 
@@ -60,17 +60,17 @@ pods:
 
 ### 📦️ Via Pypi
 
-1. Install the `jinahub-AudioCLIPEncoder` package.
+1. Install the `jinahub-YoloV5Segmenter` package.
 
 	```bash
 	pip install git+https://github.com/jina-ai/executor-yolov5.git
 	```
 
-1. Use `jinahub-vggishaudio-encoder` in your code
+1. Use `jinahub-yolov5-segmenter` in your code
 
 	```python
 	from jina import Flow
-	from jinahub.encoder.audioclip import YoloV5Segmenter
+	from jinahub.segmenter.yolov5_segmenter import YoloV5Segmenter
 	
 	f = Flow().add(uses='jinahub+docker://YoloV5Segmenter')
 	```
@@ -126,9 +126,9 @@ print(f'{resp}')
 
 ### Returns
 
-`Document` with `chunks` created that represent the detected bounding boxes. Each chunk has a blob of 3 dimensions and tags attribute containing the label and the confidence value.
+`Document` with `chunks` created that represent the detected bounding boxes. Each chunk has a blob of 3 dimensions and tags attribute containing the label (key `label`) and the confidence value (key `conf`).
 
 
 ## 🔍️ Reference
-- [AudioCLIP paper](https://arxiv.org/abs/1506.02640v5)
+- [YoloV5 paper](https://arxiv.org/abs/1506.02640v5)
 - [YoloV5 code](https://github.com/ultralytics/yolov5)

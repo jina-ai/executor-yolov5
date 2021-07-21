@@ -21,5 +21,5 @@ def test_chunks_exists(build_da):
         assert len(doc.chunks) > 0
         for chunk in doc.chunks:
             assert chunk.blob.ndim == 3
-            assert chunk.tags.get("label")
-            assert chunk.tags.get("conf")
+            assert chunk.tags.get('label')
+            assert chunk.tags.get('conf')
