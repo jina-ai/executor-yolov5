@@ -13,21 +13,25 @@ class YoloV5Segmenter(Executor):
     """
     Segment the image into bounding boxes and set labels
 
-    :param model: the yolov5 model to use
+    :param model_name_or_path: the yolov5 model to use, can be a model name specified in ultralytics/yolov5's hubconf.py
+    file, a custom model path or url
+   :param default_batch_size: default batch size
+   :param default_traversal_paths: default traversal path
+   :param device: device to be used. Use 'cuda' for GPU
+   :param size: image size used to perform inference
+   :param augment: augment images during inference
+   :param default_confidence_threshold: default confidence threshold
+
     """
 
     def __init__(self,
                  model_name_or_path: str = 'yolov5s',
                  default_batch_size: int = 32,
                  default_traversal_paths: Tuple = ('r',),
-                 device: str = 'cuda',
-                 size: int = None,
+                 device: str = 'cpu',
+                 size: int = 640,
                  augment: bool = False,
-                 conf_thres: float = 0.25,
-                 iou_thres: float = 0.45,
-                 classes: Optional[List[int]] = None,
-                 agnostic_nms: bool = False,
-                 max_det: bool = 1000,
+                 default_confidence_threshold: float = 0.25,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model_name_or_path = model_name_or_path
@@ -36,6 +40,7 @@ class YoloV5Segmenter(Executor):
         self.logger = JinaLogger(self.__class__.__name__)
         self.default_size = size
         self.default_augment = augment
+        self.default_confidence_threshold = default_confidence_threshold
 
         if device not in ['cpu', 'cuda']:
             self.logger.error('Torch device not supported. Must be cpu or cuda!')
@@ -51,18 +56,13 @@ class YoloV5Segmenter(Executor):
 
         self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
 
-        self.conf_thres = conf_thres
-        self.iou_thres = iou_thres
-        self.classes = classes
-        self.agnostic_nms = agnostic_nms
-        self.max_det = max_det
 
     @requests
     def segment(self, docs: Optional[DocumentArray], parameters: Dict, **kwargs):
         """
         Segment all docs into bounding boxes and set labels
         :param docs: documents sent to the segmenter. The docs must have `blob`.
-        :param parameters: dictionary to define the `traversal_paths` and the `batch_size`. For example,
+        :param parameters: dictionary to override the default parameters. For example,
         `parameters={'traversal_paths': ['r'], 'batch_size': 10}` will override the `self.default_traversal_paths` and
         `self.default_batch_size`.
         """
@@ -82,13 +82,15 @@ class YoloV5Segmenter(Executor):
                 images = [d.blob for d in document_batch]
                 predictions = self.model(
                     images,
-                    # size=parameters.get("size", self.default_size),
-                    # augment=parameters.get("augment", self.default_augment)
+                    size=parameters.get("size", self.default_size),
+                    augment=parameters.get("augment", self.default_augment)
                 ).pred
 
                 for doc, prediction in zip(document_batch, predictions):
                     for det in prediction:
                         *xyxy, conf, cls = det
+                        if conf < parameters.get('confidence_threshold', self.default_confidence_threshold):
+                            continue
                         c = int(cls)
                         crop = doc.blob[int(xyxy[1]):int(xyxy[3]), int(xyxy[0]):int(xyxy[2]), :]
                         doc.chunks.append(Document(
@@ -97,4 +99,7 @@ class YoloV5Segmenter(Executor):
                             ))
 
     def _attempt_load(self, model_name_or_path):
-        return torch.hub.load("ultralytics/yolov5", model_name_or_path, 'yolov5s.pt', device=self.device)
+        if model_name_or_path in torch.hub.list("ultralytics/yolov5"):
+            return torch.hub.load("ultralytics/yolov5", model_name_or_path, device=self.device)
+        else:
+            return torch.hub.load("ultralytics/yolov5", 'custom', model_name_or_path, device=self.device)
