@@ -1,12 +1,7 @@
-# 📝 PLEASE READ [THE GUIDELINES](.github/GUIDELINES.md) BEFORE STARTING.
 
-# 🏗️ PLEASE CHECK OUT [STEP-BY-STEP](.github/STEP_BY_STEP.md)
+# ✨ AudioCLIPEncoder
 
-----
-
-# ✨ MyDummyExecutor
-
-**MyDummyExecutor** is a class that ...
+**YoloV5Segmenter** is a class that wraps the [YoloV5](https://github.com/ultralytics/yolov5) model for generating bounding boxes from images and creating chunks. 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -21,7 +16,7 @@
 
 ## 🌱 Prerequisites
 
-Some conditions to fulfill before running the executor
+Install dependencies using `pip install -r requirements.txt`.
 
 ## 🚀 Usages
 
@@ -33,16 +28,15 @@ Use the prebuilt images from JinaHub in your python codes,
 ```python
 from jina import Flow
 	
-f = Flow().add(uses='jinahub+docker://MyDummyExecutor')
+f = Flow().add(uses='jinahub+docker://YoloV5Segmenter')
 ```
 
 or in the `.yml` config.
-	
 ```yaml
 jtype: Flow
 pods:
   - name: encoder
-    uses: 'jinahub+docker://MyDummyExecutor'
+    uses: 'jinahub+docker://YoloV5Segmenter'
 ```
 
 #### using source codes
@@ -51,7 +45,7 @@ Use the source codes from JinaHub in your python codes,
 ```python
 from jina import Flow
 	
-f = Flow().add(uses='jinahub://MyDummyExecutor')
+f = Flow().add(uses='jinahub://YoloV5Segmenter')
 ```
 
 or in the `.yml` config.
@@ -60,25 +54,25 @@ or in the `.yml` config.
 jtype: Flow
 pods:
   - name: encoder
-    uses: 'jinahub://MyDummyExecutor'
+    uses: 'jinahub://YoloV5Segmenter'
 ```
 
 
 ### 📦️ Via Pypi
 
-1. Install the `jinahub-MY-DUMMY-EXECUTOR` package.
+1. Install the `jinahub-AudioCLIPEncoder` package.
 
 	```bash
-	pip install git+https://github.com/jina-ai/EXECUTOR_REPO_NAME.git
+	pip install git+https://github.com/jina-ai/executor-yolov5.git
 	```
 
-1. Use `jinahub-MY-DUMMY-EXECUTOR` in your code
+1. Use `jinahub-vggishaudio-encoder` in your code
 
 	```python
 	from jina import Flow
-	from jinahub.SUB_PACKAGE_NAME.MODULE_NAME import MyDummyExecutor
+	from jinahub.encoder.audioclip import YoloV5Segmenter
 	
-	f = Flow().add(uses=MyDummyExecutor)
+	f = Flow().add(uses='jinahub+docker://YoloV5Segmenter')
 	```
 
 
@@ -87,60 +81,54 @@ pods:
 1. Clone the repo and build the docker image
 
 	```shell
-	git clone https://github.com/jina-ai/EXECUTOR_REPO_NAME.git
-	cd EXECUTOR_REPO_NAME
-	docker build -t my-dummy-executor-image .
+	git clone https://github.com/jina-ai/executor-yolov5.git
+	cd executor-yolov5
+	docker build -t executor-yolov5-segmenter .
 	```
 
-1. Use `my-dummy-executor-image` in your codes
+1. Use `executor-yolov5-segmenter` in your codes
 
 	```python
 	from jina import Flow
 	
-	f = Flow().add(uses='docker://my-dummy-executor-image:latest')
+	f = Flow().add(uses='docker://executor-yolov5-segmenter:latest')
 	```
-	
 
 ## 🎉️ Example 
 
-Here we **MUST** show a **MINIMAL WORKING EXAMPLE**. We recommend to use `jinahub+docker://MyDummyExecutor` for the purpose of boosting the usage of Jina Hub. 
+Example with real data
 
-It not necessary to demonstrate the usages of every inputs. It will be demonstrate in the next section.
 
 ```python
-from jina import Flow, Document
+import cv2
+import glob
+from jina import Flow, Document, DocumentArray
 
-f = Flow().add(uses='jinahub+docker://MyDummyExecutor')
+f = Flow().add(uses='jinahub+docker://YoloV5Segmenter', timeout_ready=3000)
 
+# Load data
+doc_array = DocumentArray([
+    Document(blob=cv2.imread("https://github.com/ultralytics/yolov5/blob/master/data/images/bus.jpg"))
+])
 with f:
-    resp = f.post(on='foo', inputs=Document(), return_results=True)
-    print(f'{resp}')
+    resp = f.post(on='test', inputs=doc_array, return_results=True)
+    
+print(f'{resp}')
 ```
 
-### `on=/index` (Optional)
 
-When there are multiple APIs, we need to list the inputs and outputs for each one. If there is only one universal API, we only demonstrate the inputs and outputs for it.
 
-#### Inputs 
 
-`Document` with `blob` of the shape `256`.
 
-#### Returns
+### Inputs 
 
-`Document` with `embedding` fields filled with an `ndarray` of the shape `embedding_dim` (=128, by default) with `dtype=nfloat32`.
+`Document` with `blob` of 3 dimensions containing the image.
 
-### `on=/update` (Optional)
+### Returns
 
-When there are multiple APIs, we need to list the inputs and outputs for each on
+`Document` with `chunks` created that represent the detected bounding boxes. Each chunk has a blob of 3 dimensions and tags attribute containing the label and the confidence value.
 
-#### Inputs 
-
-`Document` with `blob` of the shape `256`.
-
-#### Returns
-
-`Document` with `embedding` fields filled with an `ndarray` of the shape `embedding_dim` (=128, by default) with `dtype=nfloat32`.
 
 ## 🔍️ Reference
-- Some reference
-
+- [AudioCLIP paper](https://arxiv.org/abs/1506.02640v5)
+- [YoloV5 code](https://github.com/ultralytics/yolov5)
