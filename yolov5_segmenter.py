@@ -42,7 +42,7 @@ class YoloV5Segmenter(Executor):
         self.default_augment = augment
         self.default_confidence_threshold = default_confidence_threshold
 
-        if device not in ['cpu', 'cuda']:
+        if device != 'cpu' and not device.startswith('cuda'):
             self.logger.error('Torch device not supported. Must be cpu or cuda!')
             raise RuntimeError('Torch device not supported. Must be cpu or cuda!')
         if device == 'cuda' and not torch.cuda.is_available():
