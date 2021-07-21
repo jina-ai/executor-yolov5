@@ -82,8 +82,8 @@ class YoloV5Segmenter(Executor):
                 images = [d.blob for d in document_batch]
                 predictions = self.model(
                     images,
-                    size=parameters.get("size", self.default_size),
-                    augment=parameters.get("augment", self.default_augment)
+                    size=parameters.get('size', self.default_size),
+                    augment=parameters.get('augment', self.default_augment)
                 ).pred
 
                 for doc, prediction in zip(document_batch, predictions):
@@ -95,11 +95,11 @@ class YoloV5Segmenter(Executor):
                         crop = doc.blob[int(xyxy[1]):int(xyxy[3]), int(xyxy[0]):int(xyxy[2]), :]
                         doc.chunks.append(Document(
                                 blob=crop,
-                                tags={"label": self.names[c], "conf": float(conf)}
+                                tags={'label': self.names[c], 'conf': float(conf)}
                             ))
 
     def _attempt_load(self, model_name_or_path):
-        if model_name_or_path in torch.hub.list("ultralytics/yolov5"):
-            return torch.hub.load("ultralytics/yolov5", model_name_or_path, device=self.device)
+        if model_name_or_path in torch.hub.list('ultralytics/yolov5'):
+            return torch.hub.load('ultralytics/yolov5', model_name_or_path, device=self.device)
         else:
-            return torch.hub.load("ultralytics/yolov5", 'custom', model_name_or_path, device=self.device)
+            return torch.hub.load('ultralytics/yolov5', 'custom', model_name_or_path, device=self.device)
