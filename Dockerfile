@@ -1,7 +1,7 @@
 FROM jinaai/jina:2.0.7
 
 # install git
-RUN apt-get -y update && apt-get install -y git
+RUN apt-get -y update && apt-get install -y git gcc
 
 # install requirements before copying the workspace
 COPY requirements.txt /requirements.txt
