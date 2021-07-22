@@ -8,14 +8,6 @@ from jina import Flow, Document, DocumentArray
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-def test_flow_from_yml(build_da):
-    da = build_da()
-    with Flow.load_config(os.path.join(cur_dir, 'flow.yml')) as f:
-        resp = f.post(on='test', inputs=da, return_results=True)
-
-    assert resp is not None
-
-
 def test_chunks_exists(build_da):
     da = build_da()
     with Flow.load_config(os.path.join(cur_dir, 'flow.yml')) as f:
