@@ -52,7 +52,7 @@ class YoloV5Segmenter(Executor):
             )
             device = 'cpu'
         self.device = torch.device(device)
-        self.model = self._attempt_load(self.model_name_or_path)
+        self.model = self._load(self.model_name_or_path)
 
         self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
 
@@ -88,17 +88,17 @@ class YoloV5Segmenter(Executor):
 
                 for doc, prediction in zip(document_batch, predictions):
                     for det in prediction:
-                        *xyxy, conf, cls = det
+                        x1, y1, x2, y2, conf, cls = det
                         if conf < parameters.get('confidence_threshold', self.default_confidence_threshold):
                             continue
                         c = int(cls)
-                        crop = doc.blob[int(xyxy[1]):int(xyxy[3]), int(xyxy[0]):int(xyxy[2]), :]
+                        crop = doc.blob[int(y1):int(y2), int(x1):int(x2), :]
                         doc.chunks.append(Document(
                                 blob=crop,
                                 tags={'label': self.names[c], 'conf': float(conf)}
                             ))
 
-    def _attempt_load(self, model_name_or_path):
+    def _load(self, model_name_or_path):
         if model_name_or_path in torch.hub.list('ultralytics/yolov5'):
             return torch.hub.load('ultralytics/yolov5', model_name_or_path, device=self.device)
         else:

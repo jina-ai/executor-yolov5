@@ -23,8 +23,7 @@ def test_load():
         os.path.join(cur_dir, '../data/models/yolov5s.pt'),
         os.path.join(cur_dir, '../data/models/yolov5m.pt'),
         'yolov5s',
-        'yolov5m',
-        'https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5s.pt'
+        'yolov5m'
     ]
 )
 def test_model_name_or_path(build_da, model_path):
@@ -83,15 +82,15 @@ def test_traversal_paths():
 
     # detects 2 persons and 1 cell phone
     assert len(da[0].chunks) == 3
-    assert da[0].chunks[0].tags["label"] == "person"
-    assert da[0].chunks[1].tags["label"] == "person"
-    assert da[0].chunks[2].tags["label"] == "cell phone"
+    assert da[0].chunks[0].tags['label'] == 'person'
+    assert da[0].chunks[1].tags['label'] == 'person'
+    assert da[0].chunks[2].tags['label'] == 'cell phone'
 
     segmenter.segment(da, parameters={'traversal_paths': ['c']})
 
     # the first detected person spans the whole image, so segmenting the chunk produces 3 detections
     person_chunk = da[0].chunks[0]
     assert len(person_chunk.chunks) == 3
-    assert person_chunk.chunks[0].tags["label"] == "person"
-    assert person_chunk.chunks[1].tags["label"] == "person"
-    assert person_chunk.chunks[2].tags["label"] == "cell phone"
+    assert person_chunk.chunks[0].tags['label'] == 'person'
+    assert person_chunk.chunks[1].tags['label'] == 'person'
+    assert person_chunk.chunks[2].tags['label'] == 'cell phone'
