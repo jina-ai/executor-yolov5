@@ -1,4 +1,4 @@
-jtype: MyDummyExecutor
+jtype: YoloV5Segmenter
 metas:
   py_modules:
-    - MODULE_NAME.py
+    - yolov5_segmenter.py
