@@ -1,3 +1,4 @@
+NOT MAINTAINED. MOVED TO https://github.com/jina-ai/executors/tree/main/jinahub/crafters/YoloV5Segmenter
 
 # ✨ YoloV5Segmenter
 
